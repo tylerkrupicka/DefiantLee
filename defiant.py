@@ -18,6 +18,7 @@ class Defiant:
 
     def __init__(self):
         #initialize class variables
+        self.version = 1.5
         self.query = 'defiantly'
         self.count = 0
         self.tweets = []
@@ -27,50 +28,55 @@ class Defiant:
 
     def main(self):
     	while True:
-            #return tweets that contain the query
     		
-    		 
-    	
 
     def startTimer(self):
+        #start the timer and set to toggleReady after delay
         t = Timer(self.delay,toggleReady)
         t.start()
 
     def toggleReady(self):
+        #toggle ready to post depending on value
         if self.ready == False:
             self.ready == True
         else:
             self.ready == False
 
     def pollForTweets(self):
+        #add the current pulling tweets with lowered text
+        #to the array for processing for the next post
         currentPoll = api.search(q = query, rpp = 1)
         for tweet in currentPoll:
             tweet.text = tweet.text.lower()
         self.tweets.append(currentPoll)
 
     def postThanks(self):
+        #post a thank you message to the user
         sn = tweet.user.screen_name
         message = "@%s " % (sn)
         message +=  "Thank you for your service"
         api.update_status(message,tweet.id)
 
-        count += 1
-        startTimer()
-        print message + "  Count: " + str(count)
-
     def postCorrection(self, tweet):
+        #post the standard correction message in reply
+        #to the tweet
         sn = tweet.user.screen_name
         message = "@%s " % (sn)
         message +=  "Did you mean definitely?"
         api.update_status(message,tweet.id)
 
+    def afterPost(self):
+        #add to count, reset the ready timer, print status,
+        #reset tweets to analyze
         count += 1
+        toggleReady()
         startTimer()
-        print message + "  Count: " + str(count)
-
-
+        print (message + "  Count: " + str(count) +
+        " Version: " + str(self.version))
+        self.tweets = []
 
 if __name__ == '__main__':
+    #run program main
     Defiant().main()
 
 	
