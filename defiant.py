@@ -27,11 +27,28 @@ class Defiant:
 
     def main(self):
     	while True:
+            if self.timerRunning == False:
+                startTimer()
+            pollForTweets()
+            famous()
+            if self.ready = True:
+                self.timerRunning = False
+                
+                for tweet in self.tweets:
+                    if "definitely" in tweet.text:
+                        if("difference between" in tweet.text
+                            or "hate" in tweet.text or "spell" in tweet.text
+                                or "mean" in tweet.text or "differ" in tweet.text)
+                            postThanks(tweet)
+                    else:
+                        postCorrection(tweet)
 
+            timer.sleep(30)
 
     def startTimer(self):
         #start the timer and set to toggleReady after delay
         t = Timer(self.delay,toggleReady)
+        self.timerRunning = True
         t.start()
 
     def toggleReady(self):
@@ -49,16 +66,18 @@ class Defiant:
             tweet.text = tweet.text.lower()
         self.tweets.append(currentPoll)
 
-    def postThanks(self):
+    def postThanks(self,tweet):
         #post a thank you message to the user
         sn = tweet.user.screen_name
         if(len(tweet.text)+len(sn)<=97):
-        message =  "Thank you for knowing the difference RT ""
+            message =  'Thank you for knowing the difference RT "'
         else:
-        messege = "Thank Youn RT ""
+            messege = 'Thank Youn RT "'                          
         message += "@%s " % (sn)
-        message += tweet.text + " ""
+        message += tweet.text + ' "'        
         api.update_status(message,tweet.id)
+        afterPost()
+
 
     def postCorrection(self, tweet):
         #post the standard correction message in reply
@@ -67,6 +86,7 @@ class Defiant:
         message = "@%s " % (sn)
         message +=  "Did you mean definitely?"
         api.update_status(message,tweet.id)
+        afterPost()
 
     def afterPost(self):
         #add to count, reset the ready timer, print status,
@@ -77,6 +97,10 @@ class Defiant:
         print (message + "  Count: " + str(count) +
         " Version: " + str(self.version))
         self.tweets = []
+
+    def famous(self)
+        self.tweets = sorted(self.tweets, key=lambda tweet: tweet.user.followers_count)
+
 
 if __name__ == '__main__':
     #run program main
