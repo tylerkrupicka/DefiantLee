@@ -23,7 +23,7 @@ class Defiant:
     def main(self):
     	while True:
             #return tweets that contain the query
-    		defiant_tweets = api.search(q = query, rpp = 1)
+    		defiant_tweets = api.search(q = query, rpp = 100)
 
 
     		tweet = defiant_tweets[0]
@@ -43,7 +43,7 @@ class Defiant:
     		time.sleep(240)
 
     def checkTweet(self):
-        
+
 
 if __name__ == '__main__':
     Defiant().main()
