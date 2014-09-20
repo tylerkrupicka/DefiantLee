@@ -28,43 +28,51 @@ class Defiant:
     def main(self):
     	while True:
             if self.timerRunning == False:
-                startTimer()
-            pollForTweets()
-            famous()
-            if self.ready = True:
-                self.timerRunning = False
-                
+                print "starting Timer"
+                self.startTimer()
+            self.pollForTweets()
+            self.famous()
+            print len(self.tweets)
+            if self.ready == True or self.count == 0:
                 for tweet in self.tweets:
                     if "definitely" in tweet.text:
                         if("difference between" in tweet.text
                             or "hate" in tweet.text or "spell" in tweet.text
-                                or "mean" in tweet.text or "differ" in tweet.text)
-                            postThanks(tweet)
+                                or "mean" in tweet.text or "differ" in tweet.text):
+                            self.postThanks(tweet)
+                            break
                     else:
-                        postCorrection(tweet)
+                        self.postCorrection(tweet)
+                        break
 
-            timer.sleep(30)
+            print "waiting!"
+            time.sleep(30)
 
     def startTimer(self):
         #start the timer and set to toggleReady after delay
-        t = Timer(self.delay,toggleReady)
+        t = threading.Timer(self.delay,self.toggleReady)
         self.timerRunning = True
+        t.daemon = True
         t.start()
+        print "timer started"
 
     def toggleReady(self):
         #toggle ready to post depending on value
         if self.ready == False:
             self.ready == True
+            print "ready!"
         else:
             self.ready == False
 
     def pollForTweets(self):
         #add the current pulling tweets with lowered text
         #to the array for processing for the next post
-        currentPoll = api.search(q = query, rpp = 1)
+        currentPoll = api.search(q = self.query, rpp = 1)
+        print "polling!"
         for tweet in currentPoll:
             tweet.text = tweet.text.lower()
-        self.tweets.append(currentPoll)
+            self.tweets.append(tweet)
+        print len(self.tweets)
 
     def postThanks(self,tweet):
         #post a thank you message to the user
@@ -72,11 +80,11 @@ class Defiant:
         if(len(tweet.text)+len(sn)<=97):
             message =  'Thank you for knowing the difference RT "'
         else:
-            messege = 'Thank Youn RT "'                          
+            message = 'Thank Youn RT "'                          
         message += "@%s " % (sn)
         message += tweet.text + ' "'        
         api.update_status(message,tweet.id)
-        afterPost()
+        self.afterPost(message)
 
 
     def postCorrection(self, tweet):
@@ -86,21 +94,20 @@ class Defiant:
         message = "@%s " % (sn)
         message +=  "Did you mean definitely?"
         api.update_status(message,tweet.id)
-        afterPost()
+        self.afterPost(message)
 
-    def afterPost(self):
+    def afterPost(self, message):
         #add to count, reset the ready timer, print status,
         #reset tweets to analyze
-        count += 1
-        toggleReady()
-        startTimer()
-        print (message + "  Count: " + str(count) +
-        " Version: " + str(self.version))
+        self.count += 1
+        self.toggleReady()
+        print (message + "  Count: " + str(self.count))
         self.tweets = []
+        self.timerRunning = False
 
-    def famous(self)
-        self.tweets = sorted(self.tweets, key=lambda tweet: tweet.user.followers_count)
-
+    def famous(self):
+        print "sorting"
+        self.tweets = sorted(self.tweets, key=lambda tweet: tweet.user.followers_count, reverse=True)
 
 if __name__ == '__main__':
     #run program main
