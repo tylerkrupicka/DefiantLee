@@ -1,6 +1,6 @@
 import tweepy
 import time
-import timeit
+import threading
 import nltk
 from keys import keys
 
@@ -21,33 +21,54 @@ class Defiant:
         self.query = 'defiantly'
         self.count = 0
         self.tweets = []
-
+        self.timerRunning = False
+        self.ready = False
+        self.delay = 120.0
 
     def main(self):
     	while True:
             #return tweets that contain the query
     		
-    		sn = tweet.user.screen_name
-    		message = "@%s " % (sn)
-    		if "definitely" in tweet.text:
-    			message += "Thank you for your service"
-    		else:
-    			message +=  "Did you mean definitely?"
-    			
-    		api.update_status(message,tweet.id)
-    		count += 1
-    		print message + "  Count: " + str(count) 
-    		
+    		 
+    	
 
-    		time.sleep(120)
+    def startTimer(self):
+        t = Timer(self.delay,toggleReady)
+        t.start()
 
-    def ready(self):
+    def toggleReady(self):
+        if self.ready == False:
+            self.ready == True
+        else:
+            self.ready == False
 
     def pollForTweets(self):
         currentPoll = api.search(q = query, rpp = 1)
         for tweet in currentPoll:
             tweet.text = tweet.text.lower()
         self.tweets.append(currentPoll)
+
+    def postThanks(self):
+        sn = tweet.user.screen_name
+        message = "@%s " % (sn)
+        message +=  "Thank you for your service"
+        api.update_status(message,tweet.id)
+
+        count += 1
+        startTimer()
+        print message + "  Count: " + str(count)
+
+    def postCorrection(self, tweet):
+        sn = tweet.user.screen_name
+        message = "@%s " % (sn)
+        message +=  "Did you mean definitely?"
+        api.update_status(message,tweet.id)
+
+        count += 1
+        startTimer()
+        print message + "  Count: " + str(count)
+
+
 
 if __name__ == '__main__':
     Defiant().main()
