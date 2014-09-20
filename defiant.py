@@ -11,28 +11,42 @@ auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 api = tweepy.API(auth)
 
-query = "defiantly"
-count = 0
 
-while True:
+class Defiant:
 
-	defiant_tweets = api.search(q = query, rpp = 1)
+    def __init__(self):
+        #initialize class variables
+        self.query = 'defiantly'
+        self.count = 0
 
 
-	tweet = defiant_tweets[0]
-	sn = tweet.user.screen_name
-	message = "@%s " % (sn)
-	if "definitely" in tweet.text:
-		message += "Thank you for your service"
-	else:
-		message +=  "Did you mean definitely?"
-		
-	api.update_status(message,tweet.id)
-	count += 1
-	print message + "  Count: " + str(count) 
-	
+    def main(self):
+    	while True:
+            #return tweets that contain the query
+    		defiant_tweets = api.search(q = query, rpp = 1)
 
-	time.sleep(240)
+
+    		tweet = defiant_tweets[0]
+    		tweet = tweet.text.lower()
+    		sn = tweet.user.screen_name
+    		message = "@%s " % (sn)
+    		if "definitely" in tweet.text:
+    			message += "Thank you for your service"
+    		else:
+    			message +=  "Did you mean definitely?"
+    			
+    		api.update_status(message,tweet.id)
+    		count += 1
+    		print message + "  Count: " + str(count) 
+    		
+
+    		time.sleep(240)
+
+    def checkTweet(self):
+        
+
+if __name__ == '__main__':
+    Defiant().main()
 
 	
 
