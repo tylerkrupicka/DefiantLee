@@ -1,5 +1,7 @@
 import tweepy
 import time
+import timeit
+import nltk
 from keys import keys
 
 CONSUMER_KEY = keys['consumer_key']
@@ -18,16 +20,13 @@ class Defiant:
         #initialize class variables
         self.query = 'defiantly'
         self.count = 0
+        self.tweets = []
 
 
     def main(self):
     	while True:
             #return tweets that contain the query
-    		defiant_tweets = api.search(q = query, rpp = 100)
-
-
-    		tweet = defiant_tweets[0]
-    		tweet = tweet.text.lower()
+    		
     		sn = tweet.user.screen_name
     		message = "@%s " % (sn)
     		if "definitely" in tweet.text:
@@ -40,10 +39,15 @@ class Defiant:
     		print message + "  Count: " + str(count) 
     		
 
-    		time.sleep(240)
+    		time.sleep(120)
 
-    def checkTweet(self):
+    def ready(self):
 
+    def pollForTweets(self):
+        currentPoll = api.search(q = query, rpp = 1)
+        for tweet in currentPoll:
+            tweet.text = tweet.text.lower()
+        self.tweets.append(currentPoll)
 
 if __name__ == '__main__':
     Defiant().main()
