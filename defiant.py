@@ -13,7 +13,6 @@ auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 api = tweepy.API(auth)
 
-
 class Defiant:
 
     def __init__(self):
@@ -28,7 +27,7 @@ class Defiant:
 
     def main(self):
     	while True:
-    		
+
 
     def startTimer(self):
         #start the timer and set to toggleReady after delay
@@ -53,8 +52,12 @@ class Defiant:
     def postThanks(self):
         #post a thank you message to the user
         sn = tweet.user.screen_name
-        message = "@%s " % (sn)
-        message +=  "Thank you for your service"
+        if(len(tweet.text)+len(sn)<=97):
+        message =  "Thank you for knowing the difference RT ""
+        else:
+        messege = "Thank Youn RT ""
+        message += "@%s " % (sn)
+        message += tweet.text + " ""
         api.update_status(message,tweet.id)
 
     def postCorrection(self, tweet):
@@ -78,7 +81,3 @@ class Defiant:
 if __name__ == '__main__':
     #run program main
     Defiant().main()
-
-	
-
-
