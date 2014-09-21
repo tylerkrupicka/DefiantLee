@@ -95,7 +95,7 @@ class Defiant:
         message +=  "Did you mean definitely?"
         api.update_status(message,tweet.id)
 
-	f = open(self.corpusFile, 'w')
+	f = open(self.corpusFile, 'a')
 	f.write(message + '\n')
 	f.close()
 
@@ -118,7 +118,7 @@ class Defiant:
 	    self.recordHolder = best.user.screen_name
 	if best.user.followers_count > 100000:
 		save = best.user.screen_name + " Followers: " + str(best.user.followers_count) + "\n"
-		f = open(self.recordFile)
+		f = open(self.recordFile, 'a')
 		f.write(save)
 		f.close()
 
