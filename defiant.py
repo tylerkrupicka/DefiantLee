@@ -26,6 +26,9 @@ class Defiant:
         self.delay = 120.0
         self.last = []
         self.record = 0
+	self.recordHolder = " "
+	self.corpusFile = "corpus.txt"
+	self.recordFile = "records.txt"
 
     def main(self):
     	while True:
@@ -47,7 +50,7 @@ class Defiant:
                             self.postCorrection(tweet)
                             break
 
-            time.sleep(15)
+            time.sleep(60)
 
     def startTimer(self):
         #start the timer and set to toggleReady after delay
@@ -67,8 +70,7 @@ class Defiant:
         for tweet in currentPoll:
             tweet.text = tweet.text.lower()
             self.tweets.append(tweet)
-        print len(self.tweets)
-        self.tweets = self.tweets[0:100]
+        self.tweets = self.tweets[0:50]
 
     def postThanks(self,tweet):
         #post a thank you message to the user
@@ -92,6 +94,11 @@ class Defiant:
         message = "@%s " % (sn)
         message +=  "Did you mean definitely?"
         api.update_status(message,tweet.id)
+
+	f = open(self.corpusFile, 'w')
+	f.write(message + '\n')
+	f.close()
+
         self.afterPost(message)
 
     def afterPost(self, message):
@@ -99,7 +106,7 @@ class Defiant:
         #reset tweets to analyze
         self.count += 1
         self.ready = False
-        print (message + "  Count: " + str(self.count) + " Record: " + str(self.record))
+        print (message + "  Count: " + str(self.count) + " Record: " + str(self.record) + " Holder: " + str(self.recordHolder))
         self.tweets = []
         self.timerRunning = False
 
@@ -108,6 +115,12 @@ class Defiant:
         best = self.tweets[0]
         if best.user.followers_count > self.record:
             self.record = best.user.followers_count
+	    self.recordHolder = best.user.screen_name
+	if best.user.followers_count > 100000:
+		save = best.user.screen_name + " Followers: " + str(best.user.followers_count) + "\n"
+		f = open(self.recordFile)
+		f.write(save)
+		f.close()
 
     def store(self,tweet):
         self.last.append(tweet)
