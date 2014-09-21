@@ -38,7 +38,8 @@ class Defiant:
             self.pollForTweets()
             self.famous()
             if self.ready == True or self.count == 0:
-                for tweet in self.tweets:
+                #print len(self.tweets)
+		for tweet in self.tweets:
                     if tweet.text not in self.last:
                         if "definitely" in tweet.text:
                             if("difference between" in tweet.text
@@ -50,7 +51,7 @@ class Defiant:
                             self.postCorrection(tweet)
                             break
 
-            time.sleep(60)
+            time.sleep(20)
 
     def startTimer(self):
         #start the timer and set to toggleReady after delay
@@ -66,11 +67,13 @@ class Defiant:
     def pollForTweets(self):
         #add the current pulling tweets with lowered text
         #to the array for processing for the next post
-        currentPoll = api.search(q = self.query, rpp = 100)
+        currentPoll = [status for status in tweepy.Cursor(api.search, q=self.query).items(10)]
         for tweet in currentPoll:
             tweet.text = tweet.text.lower()
-            self.tweets.append(tweet)
-        self.tweets = self.tweets[0:50]
+            if tweet.text in self.last or tweet in self.tweets:
+		pass
+	    else:
+	        self.tweets.append(tweet)
 
     def postThanks(self,tweet):
         #post a thank you message to the user
@@ -79,7 +82,7 @@ class Defiant:
         if(len(tweet.text)+len(sn)<=97):
             message =  'Thank you for knowing the difference RT "'
         else:
-            message = 'Thank Youn RT "'                          
+            message = 'Thank You RT "'                          
         message += "@%s " % (sn)
         message += tweet.text + ' "'        
         api.update_status(message,tweet.id)
@@ -92,12 +95,15 @@ class Defiant:
         self.store(tweet.text)
         sn = tweet.user.screen_name
         message = "@%s " % (sn)
+
+	f = open(self.corpusFile, 'a')
+	f.write(message + tweet.text + ' \n')
+	f.close()
+
         message +=  "Did you mean definitely?"
         api.update_status(message,tweet.id)
 
-	f = open(self.corpusFile, 'a')
-	f.write(message + '\n')
-	f.close()
+	
 
         self.afterPost(message)
 
