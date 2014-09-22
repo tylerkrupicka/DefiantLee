@@ -21,6 +21,7 @@ class Defiant:
         self.query = 'defiantly'
         self.count = 0
         self.tweets = []
+	self.tweetsText = []
         self.timerRunning = False
         self.ready = False
         self.delay = 120.0
@@ -40,13 +41,12 @@ class Defiant:
             if self.ready == True or self.count == 0:
                 #print len(self.tweets)
 		for tweet in self.tweets:
-                    if tweet.text not in self.last:
-                        if "definitely" in tweet.text:
-                            if("difference between" in tweet.text
-                                or "hate" in tweet.text or "spell" in tweet.text
-                                    or "mean" in tweet.text or "differ" in tweet.text):
-                                self.postThanks(tweet)
-                                break
+                	if "definitely" in tweet.text:
+                            	if("difference between" in tweet.text
+                                	or "hate" in tweet.text or "spell" in tweet.text
+                                    		or "mean" in tweet.text or "differ" in tweet.text):
+                                	self.postThanks(tweet)
+                                	break
                         else:
                             self.postCorrection(tweet)
                             break
@@ -70,7 +70,7 @@ class Defiant:
         currentPoll = [status for status in tweepy.Cursor(api.search, q=self.query).items(10)]
         for tweet in currentPoll:
             tweet.text = tweet.text.lower()
-            if tweet.text in self.last or tweet in self.tweets:
+            if tweet.text in self.last or tweet.text in self.tweetsText:
 		pass 
 	    elif hasattr(tweet, 'retweeted_status'):
 		pass
@@ -78,6 +78,7 @@ class Defiant:
 		pass
 	    else:
 	        self.tweets.append(tweet)
+		self.tweetsText.append(tweet.text)
 
     def postThanks(self,tweet):
         #post a thank you message to the user
@@ -118,6 +119,7 @@ class Defiant:
         self.ready = False
         print (message + "  Count: " + str(self.count) + " Record: " + str(self.record) + " Holder: " + str(self.recordHolder))
         self.tweets = []
+	self.tweetsText = []
         self.timerRunning = False
 
     def famous(self):
