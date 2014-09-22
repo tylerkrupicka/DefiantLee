@@ -128,7 +128,7 @@ class Defiant:
         if best.user.followers_count > self.record:
             self.record = best.user.followers_count
 	    self.recordHolder = best.user.screen_name
-	if best.user.followers_count > 100000:
+	if best.user.followers_count > 100000 and best.text not in self.tweetsText:
 		save = best.user.screen_name + " Followers: " + str(best.user.followers_count) + "\n"
 		f = open(self.recordFile, 'a')
 		f.write(save.encode('utf8'))
