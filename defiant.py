@@ -71,6 +71,10 @@ class Defiant:
         for tweet in currentPoll:
             tweet.text = tweet.text.lower()
             if tweet.text in self.last or tweet in self.tweets:
+		pass 
+	    elif hasattr(tweet, 'retweeted_status'):
+		pass
+	    elif "rt @" in tweet.text:
 		pass
 	    else:
 	        self.tweets.append(tweet)
@@ -79,12 +83,13 @@ class Defiant:
         #post a thank you message to the user
         self.store(tweet.text)
         sn = tweet.user.screen_name
-        if(len(tweet.text)+len(sn)<=97):
+        if(len(tweet.text)+len(sn)<=70):
             message =  'Thank you for knowing the difference RT "'
         else:
             message = 'Thank You RT "'                          
         message += "@%s " % (sn)
-        message += tweet.text + ' "'        
+        message += tweet.text + ' "'
+	message = message[0:140]        
         api.update_status(message,tweet.id)
         self.afterPost(message)
 
@@ -97,13 +102,12 @@ class Defiant:
         message = "@%s " % (sn)
 
 	f = open(self.corpusFile, 'a')
-	f.write(message + tweet.text + ' \n')
+	save =  message + tweet.text + ' \n'
+	f.write(save.encode('utf8')) 
 	f.close()
 
         message +=  "Did you mean definitely?"
         api.update_status(message,tweet.id)
-
-	
 
         self.afterPost(message)
 
@@ -125,7 +129,7 @@ class Defiant:
 	if best.user.followers_count > 100000:
 		save = best.user.screen_name + " Followers: " + str(best.user.followers_count) + "\n"
 		f = open(self.recordFile, 'a')
-		f.write(save)
+		f.write(save.encode('utf8'))
 		f.close()
 
     def store(self,tweet):
