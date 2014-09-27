@@ -28,9 +28,13 @@ class Defiant:
         self.record = 0
         self.recordHolder = " "
         self.corpusFile = "corpus.txt"
+        self.correctFile = "correct.txt"
         self.recordFile = "records.txt"
         #swear words to NOT retweet
         self.swear = ["fuck","shit","bitch","ass"]
+        self.incCorpus = []
+        self.corCorpus = []
+        self.taggedCorpus = []
 
     def main(self):
         while True:
@@ -53,7 +57,7 @@ class Defiant:
                         self.postCorrection(tweet)
                         break
 
-            time.sleep(10)
+            time.sleep(20)
 
     def startTimer(self):
         #start the timer and set to toggleReady after delay
@@ -147,6 +151,78 @@ class Defiant:
         self.lastUsers.append(user)
         self.lastUsers = self.lastUsers[0:100]
 
+    def createData(self):
+        #read incorrect corpus
+        c = open(self.corpusFile)
+        inc = c.readlines()
+        c.close
+
+        #remove special characters, users, and newlines
+        for line in inc:
+            #clean characters
+            valid_chars = ' @abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+            line = ''.join(c for c in line if c in valid_chars)
+            line = line.strip()
+            #save to incorrect corpus
+            if len(line) != 0 or len(line != 1:
+                sp = line.split()
+                self.incCorpus.append(sp)
+            #remove user names
+            for sentence in self.incCorpus:
+                for word in sentence:
+                    if word[0] == "@":
+                        sentence.remove(word)
+
+        #correct tweets
+        c = open(self.correctFile)
+        cor = c.readlines()
+        c.close
+
+        #remove special characters, users, and newlines
+        for line in cor:
+            #clean characters
+            valid_chars = ' @abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+            line = ''.join(c for c in line if c in valid_chars)
+            line = line.strip()
+            #save to incorrect corpus
+            if len(line) != 0 or len(line != 1:
+                sp = line.split()
+                self.corCorpus.append(sp)
+            #remove user names
+            for sentence in self.corCorpus:
+                for word in sentence:
+                    if word[0] == "@":
+                        sentence.remove(word)
+
+
+    def generateFeatures(self,tweet):
+        index = 0
+        features = {}
+        #get index
+        for i in range(len(tweet)):
+            if tweet[i] == "self.query":
+                index = i
+        #previous word feature
+        if index != 0:
+            previousWord = tweet[index-1]
+            features['previousWord'] = previousWord
+            #previous letter
+            feaures[previousWordEndL] = previousWord[-1]
+        else:
+            features['previousWord'] = "none"
+        
+        #next word feature
+        if index != len(tweet)-1:
+            nextWord = tweet[index+1]
+            features['nextWord'] = nextWord
+            feaures[nextWordEndL] = nextWord[-1]
+        else:
+            features['nextWord'] = "none"
+
+        return features
+
+
+
 if __name__ == '__main__':
     #run program main
-    Defiant().main()
+    Defiant().createData()
