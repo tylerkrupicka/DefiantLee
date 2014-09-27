@@ -83,11 +83,7 @@ class Defiant:
 
             clean = clean.split()
             if self.classifier.classify(self.generateFeatures(clean)) == 'correct':
-                print 'correct: ' + tweet.text 
-                f = open(self.correctFile, 'a')
-                save =  tweet.text + ' \n'
-                f.write(save.encode('utf8')) 
-                f.close()
+                pass
             elif tweet.user.screen_name in self.lastUsers:
                 pass 
             elif hasattr(tweet, 'retweeted_status'):
