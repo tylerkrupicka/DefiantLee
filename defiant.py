@@ -35,6 +35,7 @@ class Defiant:
         self.incCorpus = []
         self.corCorpus = []
         self.taggedCorpus = []
+        self.classifier = ""
 
     def main(self):
         while True:
@@ -164,9 +165,12 @@ class Defiant:
             line = ''.join(c for c in line if c in valid_chars)
             line = line.strip()
             #save to incorrect corpus
-            if len(line) != 0 or len(line != 1:
+            if len(line) != 0 and len(line) != 1:
                 sp = line.split()
-                self.incCorpus.append(sp)
+                if len(sp) == 0 or len(sp) == 1:
+                    pass
+                else:
+                    self.incCorpus.append(sp)
             #remove user names
             for sentence in self.incCorpus:
                 for word in sentence:
@@ -185,9 +189,12 @@ class Defiant:
             line = ''.join(c for c in line if c in valid_chars)
             line = line.strip()
             #save to incorrect corpus
-            if len(line) != 0 or len(line != 1:
+            if len(line) != 0 and len(line) != 1:
                 sp = line.split()
-                self.corCorpus.append(sp)
+                if len(sp) == 0 or len(sp) == 1:
+                    pass
+                else:
+                    self.corCorpus.append(sp)
             #remove user names
             for sentence in self.corCorpus:
                 for word in sentence:
@@ -199,30 +206,47 @@ class Defiant:
         index = 0
         features = {}
         #get index
-        for i in range(len(tweet)):
-            if tweet[i] == "self.query":
+        for i in range(0,len(tweet)):
+            if tweet[i] == self.query:
                 index = i
         #previous word feature
         if index != 0:
             previousWord = tweet[index-1]
             features['previousWord'] = previousWord
             #previous letter
-            feaures[previousWordEndL] = previousWord[-1]
+            features['previousWordEndL'] = previousWord[-1]
         else:
             features['previousWord'] = "none"
         
         #next word feature
-        if index != len(tweet)-1:
-            nextWord = tweet[index+1]
+        if index < len(tweet)-1:
+            #print str(index) + " " + str(len(tweet))
+            nextWord = tweet[index + 1]
             features['nextWord'] = nextWord
-            feaures[nextWordEndL] = nextWord[-1]
+            features['nextWordEndL'] = nextWord[-1]
         else:
             features['nextWord'] = "none"
 
         return features
 
+    def createClassifier(self):
+        self.createData()
+        #create training corpus
+        for tweet in self.incCorpus:
+            self.taggedCorpus.append((self.generateFeatures(tweet),'incorrect'))
+        for tweet in self.corCorpus:
+            self.taggedCorpus.append((self.generateFeatures(tweet),'correct'))  
 
+        self.classifier = nltk.NaiveBayesClassifier.train(self.taggedCorpus)
 
+    def testClassifier(self):
+        while True:
+            self.createClassifier()
+            phrase = ""
+            phrase = raw_input("Enter Phrase to Classify: ")
+            phrase = phrase.split()
+            print phrase
+            print self.classifier.classify(self.generateFeatures(phrase)) 
 if __name__ == '__main__':
     #run program main
-    Defiant().createData()
+    Defiant().testClassifier()
