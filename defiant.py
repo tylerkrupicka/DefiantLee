@@ -209,23 +209,32 @@ class Defiant:
         for i in range(0,len(tweet)):
             if tweet[i] == self.query:
                 index = i
+        pos = nltk.pos_tag(tweet)
         #previous word feature
         if index != 0:
             previousWord = tweet[index-1]
+            token = pos[index-1]
             features['previousWord'] = previousWord
             #previous letter
             features['previousWordEndL'] = previousWord[-1]
+            features['previousWordPos'] = token[1]
         else:
             features['previousWord'] = "none"
+            features['previousWordEndL'] = "none"
+            features['previousWordPos'] = "none"
         
         #next word feature
         if index < len(tweet)-1:
             #print str(index) + " " + str(len(tweet))
             nextWord = tweet[index + 1]
+            token = pos[index+1]
             features['nextWord'] = nextWord
             features['nextWordEndL'] = nextWord[-1]
+            features['nextWordPos'] = token[1]
         else:
             features['nextWord'] = "none"
+            features['nextWordEndL'] = "none"
+            features['nextWordPos'] = "none"
 
         return features
 
@@ -240,8 +249,8 @@ class Defiant:
         self.classifier = nltk.NaiveBayesClassifier.train(self.taggedCorpus)
 
     def testClassifier(self):
+        self.createClassifier()
         while True:
-            self.createClassifier()
             phrase = ""
             phrase = raw_input("Enter Phrase to Classify: ")
             phrase = phrase.split()
