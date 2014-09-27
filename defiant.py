@@ -38,7 +38,9 @@ class Defiant:
         self.classifier = ""
 
     def main(self):
+	print "loading corpus and creating classifier"
         self.createClassifier()
+	print "Checking accuracy"
         print "tested accuracy: " + str((nltk.classify.accuracy(self.classifier, self.taggedCorpus)))
         while True:
             if self.timerRunning == False:
@@ -107,7 +109,7 @@ class Defiant:
         if(len(tweet.text)+len(sn)<=70):
             message =  'Thank you for knowing the difference RT "'
         else:
-            message = 'Thank You RT "'                          
+            message = 'Definitely. RT "'                          
         message += "@%s " % (sn)
         message += tweet.text + ' "'
         message = message[0:140]        
