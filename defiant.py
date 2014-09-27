@@ -38,6 +38,8 @@ class Defiant:
         self.classifier = ""
 
     def main(self):
+        self.createClassifier()
+        print "tested accuracy: " + str((nltk.classify.accuracy(self.classifier, self.taggedCorpus)))
         while True:
             if self.timerRunning == False:
                 self.ready = False
@@ -77,11 +79,20 @@ class Defiant:
         currentPoll = [status for status in tweepy.Cursor(api.search, q=self.query).items(20)]
         for tweet in currentPoll:
             tweet.text = tweet.text.lower()
-            if tweet.user.screen_name in self.lastUsers:
+            clean = self.cleanText(tweet.text)
+
+            clean = clean.split()
+            if self.classifier.classify(self.generateFeatures(clean)) == 'correct':
+                print 'correct: ' + tweet.text 
+                f = open(self.correctFile, 'a')
+                save =  tweet.text + ' \n'
+                f.write(save.encode('utf8')) 
+                f.close()
+            elif tweet.user.screen_name in self.lastUsers:
                 pass 
             elif hasattr(tweet, 'retweeted_status'):
                 pass
-            elif "rt @" in tweet.text:
+            elif "rt @" in tweet.text or " rt " in tweet.text:
                 pass
             elif self.name in tweet.text:
                 pass
@@ -201,6 +212,17 @@ class Defiant:
                     if word[0] == "@":
                         sentence.remove(word)
 
+    def cleanText(self,text):
+        valid_chars = ' @abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        text = ''.join(c for c in text if c in valid_chars)
+        text = text.strip()
+        #remove user names
+        sent = text.split()
+        for word in sent:
+            if word[0] == "@":
+                sent.remove(word)
+        clean = " "
+        return clean.join(sent)    
 
     def generateFeatures(self,tweet):
         index = 0
@@ -250,12 +272,14 @@ class Defiant:
 
     def testClassifier(self):
         self.createClassifier()
+        print "tested accuracy: " + str((nltk.classify.accuracy(self.classifier, self.taggedCorpus)))
         while True:
             phrase = ""
             phrase = raw_input("Enter Phrase to Classify: ")
             phrase = phrase.split()
             print phrase
-            print self.classifier.classify(self.generateFeatures(phrase)) 
+            print self.classifier.classify(self.generateFeatures(phrase))
+
 if __name__ == '__main__':
     #run program main
-    Defiant().testClassifier()
+    Defiant().main()
