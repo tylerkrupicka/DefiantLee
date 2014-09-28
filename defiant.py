@@ -80,7 +80,7 @@ class Defiant:
         #to the array for processing for the next post
         try:
 		currentPoll = [status for status in tweepy.Cursor(api.search, q=self.query).items(20)]
-        except TweepError, e:
+        except tweepy.TweepError, e:
 		print 'failed because of %s' % e.reason
 	
 	for tweet in currentPoll:
@@ -119,7 +119,7 @@ class Defiant:
         message = message[0:140]        
         try:
 		api.update_status(message,tweet.id)
-	except TweepError, e:
+	except tweepy.TweepError, e:
 		print 'failed because of %s' % e.reason
         self.afterPost(message)
 
@@ -139,7 +139,7 @@ class Defiant:
         message +=  "Did you mean definitely?"
         try:
 		api.update_status(message,tweet.id)
-	except TweepError, e:	
+	except tweepy.TweepError, e:	
 		print 'failed because of %s' % e.reason
 
         self.afterPost(message)
