@@ -52,15 +52,16 @@ class Defiant:
             if self.ready == True or self.count == 0:
                 #print len(self.tweets)
                 for tweet in self.tweets:
-                    if "definitely" in tweet.text:
-                                if("difference between" in tweet.text
-                                    or "hate" in tweet.text or "spell" in tweet.text
-                                            or "mean" in tweet.text or "differ" in tweet.text):
-                                    self.postThanks(tweet)
-                                    break
-                    else:
-                        self.postCorrection(tweet)
-                        break
+                	if tweet.user.screen_name not in self.lastUsers:		    	
+				if "definitely" in tweet.text:
+                                	if("difference between" in tweet.text
+                                    		or "hate" in tweet.text or "spell" in tweet.text
+                                            		or "mean" in tweet.text or "differ" in tweet.text):
+                                    		self.postThanks(tweet)
+                                    		break
+                    		else:
+                        		self.postCorrection(tweet)
+                        		break
 
             time.sleep(20)
 
@@ -170,6 +171,7 @@ class Defiant:
     def store(self,user):
         self.lastUsers.append(user)
         self.lastUsers = self.lastUsers[0:100]
+	print self.lastUsers
 
     def createData(self):
         #read incorrect corpus
