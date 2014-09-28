@@ -78,8 +78,12 @@ class Defiant:
     def pollForTweets(self):
         #add the current pulling tweets with lowered text
         #to the array for processing for the next post
-        currentPoll = [status for status in tweepy.Cursor(api.search, q=self.query).items(20)]
-        for tweet in currentPoll:
+        try:
+		currentPoll = [status for status in tweepy.Cursor(api.search, q=self.query).items(20)]
+        except TweepError, e:
+		print 'failed because of %s' % e.reason
+	
+	for tweet in currentPoll:
             tweet.text = tweet.text.lower()
             clean = self.cleanText(tweet.text)
 
@@ -113,7 +117,10 @@ class Defiant:
         message += "@%s " % (sn)
         message += tweet.text + ' "'
         message = message[0:140]        
-        api.update_status(message,tweet.id)
+        try:
+		api.update_status(message,tweet.id)
+	except TweepError, e:
+		print 'failed because of %s' % e.reason
         self.afterPost(message)
 
 
@@ -130,7 +137,10 @@ class Defiant:
         f.close()
 
         message +=  "Did you mean definitely?"
-        api.update_status(message,tweet.id)
+        try:
+		api.update_status(message,tweet.id)
+	except TweepError, e:	
+		print 'failed because of %s' % e.reason
 
         self.afterPost(message)
 
