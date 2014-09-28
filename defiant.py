@@ -32,16 +32,18 @@ class Defiant:
         self.recordFile = "records.txt"
         #swear words to NOT retweet
         self.swear = ["fuck","shit","bitch","ass"]
+        self.determiners = ["difference between","hate","spell","mean", "differ"]
         self.incCorpus = []
         self.corCorpus = []
         self.taggedCorpus = []
         self.classifier = ""
 
     def main(self):
-	print "loading corpus and creating classifier"
+        print "loading corpus and creating classifier"
         self.createClassifier()
-	print "Checking accuracy"
+        print "Checking accuracy"
         print "tested accuracy: " + str((nltk.classify.accuracy(self.classifier, self.taggedCorpus)))
+        
         while True:
             if self.timerRunning == False:
                 self.ready = False
@@ -50,20 +52,26 @@ class Defiant:
             self.pollForTweets()
             self.famous()
             if self.ready == True or self.count == 0:
-                #print len(self.tweets)
-                for tweet in self.tweets:
-                	if tweet.user.screen_name not in self.lastUsers:		    	
-				if "definitely" in tweet.text:
-                                	if("difference between" in tweet.text
-                                    		or "hate" in tweet.text or "spell" in tweet.text
-                                            		or "mean" in tweet.text or "differ" in tweet.text):
-                                    		self.postThanks(tweet)
-                                    		break
-                    		else:
-                        		self.postCorrection(tweet)
-                        		break
+                self.decideTweet()
 
             time.sleep(20)
+
+    def decideTweet(self):
+        #in case of empty list
+        while len(self.tweets) == 0:
+            self.pollForTweets()
+            time.sleep(30)
+
+        for tweet in self.tweets:
+            if tweet.user.screen_name not in self.lastUsers:                
+                if "definitely" in tweet.text:
+                    for term in self.determiners():
+                        if term in tweet.text:
+                            self.postThanks(tweet)
+                            break
+                else:
+                    self.postCorrection(tweet)
+                    break
 
     def startTimer(self):
         #start the timer and set to toggleReady after delay
@@ -74,21 +82,21 @@ class Defiant:
 
     def setReady(self):
         #toggle ready to post depending on value
-            self.ready = True
+        self.ready = True
 
     def pollForTweets(self):
         #add the current pulling tweets with lowered text
         #to the array for processing for the next post
         try:
-		currentPoll = [status for status in tweepy.Cursor(api.search, q=self.query).items(20)]
+            currentPoll = [status for status in tweepy.Cursor(api.search, q=self.query).items(20)]
         except tweepy.TweepError, e:
-		print 'failed because of %s' % e.reason
-	
-	for tweet in currentPoll:
+            print 'poll failed because of %s' % e.reason
+    
+        for tweet in currentPoll:
             tweet.text = tweet.text.lower()
             clean = self.cleanText(tweet.text)
-
             clean = clean.split()
+            
             if self.classifier.classify(self.generateFeatures(clean)) == 'correct':
                 pass
             elif tweet.user.screen_name in self.lastUsers:
@@ -118,10 +126,15 @@ class Defiant:
         message += "@%s " % (sn)
         message += tweet.text + ' "'
         message = message[0:140]        
+        
         try:
-		api.update_status(message,tweet.id)
-	except tweepy.TweepError, e:
-		print 'failed because of %s' % e.reason
+            api.update_status(message,tweet.id)
+        except tweepy.TweepError, e:
+            print 'thanks failed because of %s' % e.reason
+            if len(self.tweets) != 0:
+                self.tweets = self.tweets[1:]
+                self.decideTweet()
+        
         self.afterPost(message)
 
 
@@ -138,10 +151,14 @@ class Defiant:
         f.close()
 
         message +=  "Did you mean definitely?"
+        
         try:
-		api.update_status(message,tweet.id)
-	except tweepy.TweepError, e:	
-		print 'failed because of %s' % e.reason
+            api.update_status(message,tweet.id)
+        except tweepy.TweepError, e:    
+            print 'correction failed because of %s' % e.reason
+            if len(self.tweets) != 0:
+                self.tweets = self.tweets[1:]
+            self.decideTweet()
 
         self.afterPost(message)
 
@@ -171,7 +188,7 @@ class Defiant:
     def store(self,user):
         self.lastUsers.append(user)
         self.lastUsers = self.lastUsers[0:100]
-	#print self.lastUsers
+    #print self.lastUsers
 
     def createData(self):
         #read incorrect corpus
