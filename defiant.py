@@ -171,7 +171,7 @@ class Defiant:
     def store(self,user):
         self.lastUsers.append(user)
         self.lastUsers = self.lastUsers[0:100]
-	print self.lastUsers
+	#print self.lastUsers
 
     def createData(self):
         #read incorrect corpus
