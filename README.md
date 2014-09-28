@@ -1,7 +1,7 @@
 DefiantLee
 ==========
 
-A twitter bot for helping people see if they typed "defiantly" when they meant definitely.
+A twitter bot for helping people see if they typed "defiantly" when they meant definitely. The bot uses NLTK to create a Naive Bayes machine learning classifier for determine use correctness. Features for analysis are nearby words, as well as comparison using part of speech tagging. 
 
 Uses:
 Python 2.7
