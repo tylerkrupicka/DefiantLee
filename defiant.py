@@ -62,7 +62,8 @@ class Defiant:
             self.pollForTweets()
             time.sleep(30)
 
-        for tweet in self.tweets:
+	tweetcopy = self.tweets
+        for tweet in tweetcopy:
             if tweet.user.screen_name not in self.lastUsers:                
                 if "definitely" in tweet.text:
                     for term in self.determiners:
@@ -72,6 +73,7 @@ class Defiant:
                 else:
                     self.postCorrection(tweet)
                     break
+	    self.tweets.pop(0)
 
     def startTimer(self):
         #start the timer and set to toggleReady after delay
@@ -88,7 +90,7 @@ class Defiant:
         #add the current pulling tweets with lowered text
         #to the array for processing for the next post
         try:
-            currentPoll = [status for status in tweepy.Cursor(api.search, q=self.query).items(20)]
+            currentPoll = [status for status in tweepy.Cursor(api.search, q=self.query).items(10)]
         except tweepy.TweepError, e:
             print 'poll failed because of %s' % e.reason
     
@@ -132,10 +134,10 @@ class Defiant:
         except tweepy.TweepError, e:
             print 'thanks failed because of %s' % e.reason
             if len(self.tweets) != 0:
-                self.tweets = self.tweets[1:]
-                self.decideTweet()
-        
-        self.afterPost(message)
+                self.tweets.pop(0)
+            self.decideTweet()
+        else:
+            self.afterPost(message)
 
 
     def postCorrection(self, tweet):
@@ -157,10 +159,10 @@ class Defiant:
         except tweepy.TweepError, e:    
             print 'correction failed because of %s' % e.reason
             if len(self.tweets) != 0:
-                self.tweets = self.tweets[1:]
+                self.tweets.pop(0)
             self.decideTweet()
-
-        self.afterPost(message)
+	else:
+            self.afterPost(message)
 
     def afterPost(self, message):
         #add to count, reset the ready timer, print status,
@@ -169,7 +171,6 @@ class Defiant:
         self.ready = False
         print (message + "  Count: " + str(self.count) + " Record: " + str(self.record) + " Holder: " + str(self.recordHolder))
         self.tweets = []
-        self.tweetsText = []
         self.timerRunning = False
 
     def famous(self):
