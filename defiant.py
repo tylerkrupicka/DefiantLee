@@ -65,7 +65,7 @@ class Defiant:
         for tweet in self.tweets:
             if tweet.user.screen_name not in self.lastUsers:                
                 if "definitely" in tweet.text:
-                    for term in self.determiners():
+                    for term in self.determiners:
                         if term in tweet.text:
                             self.postThanks(tweet)
                             break
