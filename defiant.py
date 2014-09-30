@@ -73,7 +73,8 @@ class Defiant:
                 else:
                     self.postCorrection(tweet)
                     break
-	    self.tweets.pop(0)
+	    if len(self.tweets) != 0:
+	        self.tweets.pop(0)
 
     def startTimer(self):
         #start the timer and set to toggleReady after delay
@@ -132,7 +133,7 @@ class Defiant:
         try:
             api.update_status(message,tweet.id)
         except tweepy.TweepError, e:
-            print 'thanks failed because of %s' % e.reason
+            #print 'thanks failed because of %s' % e.reason
             if len(self.tweets) != 0:
                 self.tweets.pop(0)
             self.decideTweet()
@@ -147,17 +148,17 @@ class Defiant:
         sn = tweet.user.screen_name
         message = "@%s " % (sn)
 
-        f = open(self.corpusFile, 'a')
-        save =  message + tweet.text + ' \n'
-        f.write(save.encode('utf8')) 
-        f.close()
+        #f = open(self.corpusFile, 'a')
+        #save =  message + tweet.text + ' \n'
+        #f.write(save.encode('utf8')) 
+        #f.close()
 
         message +=  "Did you mean definitely?"
         
         try:
             api.update_status(message,tweet.id)
         except tweepy.TweepError, e:    
-            print 'correction failed because of %s' % e.reason
+            #print 'correction failed because of %s' % e.reason
             if len(self.tweets) != 0:
                 self.tweets.pop(0)
             self.decideTweet()
