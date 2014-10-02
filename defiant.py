@@ -179,14 +179,14 @@ class Defiant:
 		self.tweets = sorted(self.tweets, key=lambda tweet: tweet.user.followers_count, reverse=True)
         	best = self.tweets[0]
         	if best.user.followers_count > self.record:
-            	self.record = best.user.followers_count
-            	self.recordHolder = best.user.screen_name
+            		self.record = best.user.followers_count
+            		self.recordHolder = best.user.screen_name
 
         	if best.user.followers_count > 100000 and best.user.screen_name not in self.lastUsers:
-            	save = best.user.screen_name + " Followers: " + str(best.user.followers_count) + "\n"
-            	f = open(self.recordFile, 'a')
-            	f.write(save.encode('utf8'))
-            	f.close()
+            		save = best.user.screen_name + " Followers: " + str(best.user.followers_count) + "\n"
+            		f = open(self.recordFile, 'a')
+            		f.write(save.encode('utf8'))
+            		f.close()
 
     def store(self,user):
         self.lastUsers.append(user)
