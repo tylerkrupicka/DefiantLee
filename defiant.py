@@ -23,7 +23,7 @@ class Defiant:
         self.tweets = []
         self.timerRunning = False
         self.ready = False
-        self.delay = 90.0
+        self.delay = 100.0
         self.lastUsers = []
         self.record = 0
         self.recordHolder = " "
@@ -90,7 +90,8 @@ class Defiant:
     def pollForTweets(self):
         #add the current pulling tweets with lowered text
         #to the array for processing for the next post
-        try:
+        currentPoll = []
+	try:
             currentPoll = [status for status in tweepy.Cursor(api.search, q=self.query).items(10)]
         except tweepy.TweepError, e:
             print 'poll failed because of %s' % e.reason
