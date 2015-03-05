@@ -47,9 +47,12 @@ class Defiant:
         while True:
             if self.timerRunning == False:
                 self.ready = False
+                #create timer thread
                 self.startTimer()
             
+            #start polling
             self.pollForTweets()
+            #check follower count
             self.famous()
             if self.ready == True or self.count == 0:
                 self.decideTweet()
@@ -62,6 +65,7 @@ class Defiant:
             self.pollForTweets()
             time.sleep(30)
 
+	#check if tweet is correcting people
 	tweetcopy = self.tweets
         for tweet in tweetcopy:
             if tweet.user.screen_name not in self.lastUsers:                
@@ -101,14 +105,19 @@ class Defiant:
             clean = self.cleanText(tweet.text)
             clean = clean.split()
             
+            #run through classifiers
             if self.classifier.classify(self.generateFeatures(clean)) == 'correct':
                 pass
+            #check if weve posted before
             elif tweet.user.screen_name in self.lastUsers:
                 pass 
+            #dont respond to retweets
             elif hasattr(tweet, 'retweeted_status'):
                 pass
+            #another form of retweets
             elif "rt @" in tweet.text or " rt " in tweet.text:
                 pass
+            #dont respond if they are talking to us
             elif self.name in tweet.text:
                 pass
             else:
@@ -122,7 +131,8 @@ class Defiant:
         for word in self.swear:
             if word in tweet.text:
                 tweet.text.replace(word, "*")
-
+	
+	#commend people that are correcting
         if(len(tweet.text)+len(sn)<=70):
             message =  'Thank you for knowing the difference RT "'
         else:
@@ -131,6 +141,7 @@ class Defiant:
         message += tweet.text + ' "'
         message = message[0:140]        
         
+        #try to post, intercept twitter errors
         try:
             api.update_status(message,tweet.id)
         except tweepy.TweepError, e:
@@ -176,6 +187,7 @@ class Defiant:
         self.timerRunning = False
 
     def famous(self):
+        #sort by followers
         if len(self.tweets) != 0:
 		self.tweets = sorted(self.tweets, key=lambda tweet: tweet.user.followers_count, reverse=True)
         	best = self.tweets[0]
