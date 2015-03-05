@@ -11,3 +11,9 @@ NLTK
 Looks for uses of the word defiantly that are in places when definitely would normally be used, and chooses one every time interval to reply to and let them know.
 
 https://twitter.com/DefiantLee_/with_replies
+
+Writeup: http://tylerkrupicka.com/blog/Defiant-Lee-A-Naive-Bayes-Twitter-Bot.html
+
+So this bot had its API key removed - I decided to transfer some of the machine learning and corpus over to a site that displays misuse. Now running on defiantly.me.
+
+Writeup: http://tylerkrupicka.com/blog/defiantly.me.html
